@@ -30,9 +30,7 @@ const LoginScreen = () => {
   }, []);
 
   async function authenticate() {
-    const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: true,
-    });
+    const redirectUri = "exp://localhost:19002/--/spotify-auth-callback";
 
     // Cấu hình discovery với các endpoint cho Spotify
     const discovery = {
