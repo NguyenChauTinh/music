@@ -39,9 +39,18 @@ const LikedSongsScreen = () => {
     "#144272",
   ];
   const navigation = useNavigation();
+  const [backgroundColor, setBackgroundColor] = useState("#0A2647");
+  const { currentTrack, setCurrentTrack } = useContext(Player);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchedTracks, setSearchedTracks] = useState([]);
   const [input, setInput] = useState("");
   const [savedTracks, setSavedTracks] = useState([]);
-  const { currentTrack, setCurrentTrack } = useContext(Player);
+  const value = useRef(0);
+  const [currentSound, setCurrentSound] = useState(null);
+  const [progress, setProgress] = useState(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   async function getSavedTracks() {
     const accessToken = await AsyncStorage.getItem("token");
@@ -207,7 +216,7 @@ const LikedSongsScreen = () => {
 
       {currentTrack && (
         <Pressable
-          // onPress={() => setModalVisible(!modalVisible)}
+          onPress={() => setModalVisible(!modalVisible)}
           style={{
             backgroundColor: "#5072A7",
             width: "90%",
@@ -252,6 +261,44 @@ const LikedSongsScreen = () => {
           </View>
         </Pressable>
       )}
+
+      <BottomModal
+        visible={modalVisible}
+        onHardwareBackPress={() => setModalVisible(false)}
+        swipeDirection={["up", "down"]}
+        swipeThreshold={200}
+      >
+        <ModalContent
+          style={{ height: "100%", width: "100%", backgroundColor: "#5072A7" }}
+        >
+          <View style={{ height: "100%", width: "100%", marginTop: 40 }}>
+            <Pressable
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <AntDesign
+                onPress={() => setModalVisible(!modalVisible)}
+                name="down"
+                size={24}
+                color="white"
+              />
+
+              <Text
+                style={{ fontSize: 14, fontWeight: "bold", color: "white" }}
+              >
+                {currentTrack?.track?.name}
+              </Text>
+
+              <Entypo name="dots-three-vertical" size={24} color="white" />
+            </Pressable>
+
+            <View style={{ height: 70 }} />
+          </View>
+        </ModalContent>
+      </BottomModal>
     </>
   );
 };
