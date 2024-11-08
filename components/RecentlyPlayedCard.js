@@ -19,11 +19,14 @@ const RecentlyPlayedCard = ({ item }) => {
       />
       <Text
         numberOfLines={1}
+        ellipsizeMode="tail"
         style={{
           fontSize: 13,
           fontWeight: "500",
           color: "white",
           marginTop: 10,
+          marginBottom: 10,
+          width: 130,
         }}
       >
         {item?.track?.name}

@@ -325,7 +325,7 @@ const HomeScreen = () => {
             fontSize: 19,
             fontWeight: "bold",
             marginHorizontal: 10,
-            marginTop: 10,
+            marginTop: 20,
           }}
         >
           Your Follower Artists
@@ -350,6 +350,7 @@ const HomeScreen = () => {
           Recently Played
         </Text>
         <FlatList
+          // style={{ marginVertical: 10 }}
           data={recentlyplayed}
           horizontal
           showsHorizontalScrollIndicator={false}
