@@ -20,6 +20,7 @@ import { Entypo } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import SongItem from "../components/SongItem";
+import { Player } from "../app/PlayerContext";
 
 const LikedSongsScreen = () => {
   const colors = [
@@ -36,6 +37,7 @@ const LikedSongsScreen = () => {
   const navigation = useNavigation();
   const [input, setInput] = useState("");
   const [savedTracks, setSavedTracks] = useState([]);
+  // const { currentTrack, setCurrentTrack } = useContext(Player);
 
   async function getSavedTracks() {
     const accessToken = await AsyncStorage.getItem("token");
@@ -62,6 +64,13 @@ const LikedSongsScreen = () => {
   }, []);
 
   // console.log(savedTracks);
+
+  const playTrack = async () => {
+    if (savedTracks.length > 0) {
+      setCurrentTrack(savedTracks[0]);
+    }
+    await play(savedTracks[0]);
+  };
 
   return (
     <LinearGradient colors={["#614385", "#516395"]} style={{ flex: 1 }}>
