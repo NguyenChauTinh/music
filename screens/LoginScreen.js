@@ -42,6 +42,7 @@ const LoginScreen = () => {
     const authRequest = new AuthSession.AuthRequest({
       clientId: "01be9f4db03f4b4b9eadfac76c10edac",
       scopes: [
+        "user-follow-read",
         "user-read-email",
         "user-library-read",
         "user-read-recently-played",

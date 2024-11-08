@@ -24,6 +24,8 @@ const HomeScreen = () => {
   const [recentlyplayed, setRecentlyPlayed] = useState([]);
   const [topArtists, setTopArtists] = useState([]);
 
+  const [followedArtists, setFollowedArtists] = useState([]);
+
   const greetingMessage = () => {
     const currentTime = new Date().getHours();
     if (currentTime < 12) {
@@ -112,33 +114,62 @@ const HomeScreen = () => {
     );
   };
 
+  // useEffect(() => {
+  //   const getTopItems = async () => {
+  //     try {
+  //       const accessToken = await AsyncStorage.getItem("token");
+  //       if (!accessToken) {
+  //         console.log("Access token not found");
+  //         return;
+  //       }
+  //       const type = "artists";
+  //       const response = await axios.get(
+  //         `https://api.spotify.com/v1/me/top/${type}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           },
+  //         }
+  //       );
+  //       setTopArtists(response.data.items);
+  //     } catch (err) {
+  //       console.log(err.message);
+  //     }
+  //   };
+
+  //   getTopItems();
+  // }, []);
+
+  // console.log(topArtists);
+
   useEffect(() => {
-    const getTopItems = async () => {
+    const getFollowedArtists = async () => {
       try {
         const accessToken = await AsyncStorage.getItem("token");
         if (!accessToken) {
           console.log("Access token not found");
           return;
         }
-        const type = "artists";
+
         const response = await axios.get(
-          `https://api.spotify.com/v1/me/top/${type}`,
+          "https://api.spotify.com/v1/me/following?type=artist",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           }
         );
-        setTopArtists(response.data.items);
+
+        setFollowedArtists(response.data.artists.items);
       } catch (err) {
-        console.log(err.message);
+        console.log("Error fetching followed artists:", err.message);
       }
     };
 
-    getTopItems();
+    getFollowedArtists();
   }, []);
 
-  console.log(topArtists);
+  // console.log(followedArtists);
 
   return (
     <LinearGradient colors={["#040306", "#131624"]} style={{ flex: 1 }}>
@@ -286,6 +317,45 @@ const HomeScreen = () => {
           numColumns={2}
           columnWrapperStyle={{ justifyContent: "space-between" }}
           nestedScrollEnabled={true}
+        />
+
+        <Text
+          style={{
+            color: "white",
+            fontSize: 19,
+            fontWeight: "bold",
+            marginHorizontal: 10,
+            marginTop: 10,
+          }}
+        >
+          Your Follower Artists
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {followedArtists.map((item, index) => (
+            <ArtistCard item={item} key={index} />
+          ))}
+        </ScrollView>
+
+        <View style={{ height: 10 }} />
+
+        <Text
+          style={{
+            color: "white",
+            fontSize: 19,
+            fontWeight: "bold",
+            marginHorizontal: 10,
+            marginTop: 10,
+          }}
+        >
+          Recently Played
+        </Text>
+        <FlatList
+          data={recentlyplayed}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <RecentlyPlayedCard item={item} key={index} />
+          )}
         />
       </ScrollView>
     </LinearGradient>
