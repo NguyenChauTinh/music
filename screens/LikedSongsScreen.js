@@ -296,6 +296,74 @@ const LikedSongsScreen = () => {
             </Pressable>
 
             <View style={{ height: 70 }} />
+
+            <View style={{ padding: 10 }}>
+              <Image
+                style={{ width: "100%", height: 330, borderRadius: 4 }}
+                source={{ uri: currentTrack?.track?.album?.images[0].url }}
+              />
+              <View
+                style={{
+                  marginTop: 20,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <View>
+                  <Text
+                    style={{ fontSize: 18, fontWeight: "bold", color: "white" }}
+                  >
+                    {currentTrack?.track?.name}
+                  </Text>
+                  <Text style={{ color: "#D3D3D3", marginTop: 4 }}>
+                    {currentTrack?.track?.artists[0].name}
+                  </Text>
+                </View>
+
+                <AntDesign name="heart" size={24} color="#1DB954" />
+              </View>
+
+              <View style={{ marginTop: 10 }}>
+                <Text>Progress bar</Text>
+
+                <View
+                  style={{
+                    marginTop: 12,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 15 ,color:"#D3D3D3"}}>0:00</Text>
+
+                  <Text style={{ color: "white", fontSize: 15 ,color:"#D3D3D3"}}>0:30</Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginTop: 17,
+                }}
+              >
+                <Pressable>
+                  <FontAwesome name="arrows" size={30} color="#03C03C" />
+                </Pressable>
+                <Pressable>
+                  <Ionicons name="play-skip-back" size={30} color="white" />
+                </Pressable>
+                <Pressable>
+                  <AntDesign name="pausecircle" size={30} color="white" />
+                </Pressable>
+                <Pressable>
+                  <Ionicons name="play-skip-forward" size={30} color="white" />
+                </Pressable>
+                <Pressable>
+                  <Feather name="repeat" size={30} color="#03C03C" />
+                </Pressable>
+              </View>
+            </View>
           </View>
         </ModalContent>
       </BottomModal>
