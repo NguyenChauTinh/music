@@ -93,39 +93,57 @@ const LikedSongsScreen = () => {
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
         shouldDuckAndroid: false,
-      })
-      const {sound,status} = await Audio.Sound.createAsync(
+      });
+      const { sound, status } = await Audio.Sound.createAsync(
         {
-          uri: preview_url
+          uri: preview_url,
         },
         {
           shouldPlay: true,
-          isLooping: false
+          isLooping: false,
         },
-        onPlaybackStatusUpdate,
-      )
+        onPlaybackStatusUpdate
+      );
       console.log("sound", status);
       onPlaybackStatusUpdate(status);
       setCurrentSound(sound);
+      setIsPlaying(status.isLoaded);
       await sound.playAsync();
     } catch (err) {
       console.log(err.message);
     }
   };
-  const onPlaybackStatusUpdate = async(status) => {
+  const onPlaybackStatusUpdate = async (status) => {
     console.log(status);
     if (status.isLoaded && status.isPlaying) {
       const progress = status.positionMillis / status.durationMillis;
       console.log("progresss", progress);
       setProgress(progress);
-      setCurrentTime(progress.positionMillis);
+      setCurrentTime(status.positionMillis);
       setTotalDuration(status.durationMillis);
-    } 
+    }
   };
 
   console.log(currentTrack);
 
   const circleSize = 12;
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  const handlePlayPause = async () => {
+    if (currentSound) {
+      if (isPlaying) {
+        await currentSound.pauseAsync();
+      } else {
+        await currentSound.playAsync();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   return (
     <>
@@ -374,23 +392,25 @@ const LikedSongsScreen = () => {
                   <View
                     style={[
                       styles.progressbar,
-                      { width: `${progress * 100}%`},
+                      { width: `${progress * 100}%` },
                     ]}
                   />
-                  <View style={[
-                    {
-                      position: "absolute",
-                      top:-5,
-                      width: circleSize,
-                      height: circleSize,
-                      borderRadius: circleSize / 2,
-                      backgroundColor: "white"
-                    },
-                    {
-                      left: `${progress * 100}%`,
-                      marginLeft: -circleSize / 2,
-                    }
-                  ]} />
+                  <View
+                    style={[
+                      {
+                        position: "absolute",
+                        top: -5,
+                        width: circleSize,
+                        height: circleSize,
+                        borderRadius: circleSize / 2,
+                        backgroundColor: "white",
+                      },
+                      {
+                        left: `${progress * 100}%`,
+                        marginLeft: -circleSize / 2,
+                      },
+                    ]}
+                  />
                 </View>
 
                 <View
@@ -404,13 +424,13 @@ const LikedSongsScreen = () => {
                   <Text
                     style={{ color: "white", fontSize: 15, color: "#D3D3D3" }}
                   >
-                    0:00
+                    {formatTime(currentTime)}
                   </Text>
 
                   <Text
                     style={{ color: "white", fontSize: 15, color: "#D3D3D3" }}
                   >
-                    0:30
+                    {formatTime(totalDuration)}
                   </Text>
                 </View>
               </View>
@@ -428,8 +448,25 @@ const LikedSongsScreen = () => {
                 <Pressable>
                   <Ionicons name="play-skip-back" size={30} color="white" />
                 </Pressable>
-                <Pressable>
-                  <AntDesign name="pausecircle" size={30} color="white" />
+                <Pressable onPress={handlePlayPause}>
+                  {isPlaying ? (
+                    <Feather name="pause-circle" size={60} color="white" />
+                  ) : (
+                    <Pressable
+                      onPress={handlePlayPause}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 30,
+                        backgroundColor: "white",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Entypo name="controller-play" size={40} color="black" />
+                    </Pressable>
+                  )}
+                 
                 </Pressable>
                 <Pressable>
                   <Ionicons name="play-skip-forward" size={30} color="white" />
