@@ -88,42 +88,44 @@ const LikedSongsScreen = () => {
   const play = async (nextTrack) => {
     console.log(nextTrack);
     const preview_url = nextTrack?.track?.preview_url;
-    try{
+    try {
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
         shouldDuckAndroid: false,
       })
-      const {sound, status} = await Audio.Sound.createAsync(
+      const {sound,status} = await Audio.Sound.createAsync(
         {
-          uri:preview_url
+          uri: preview_url
         },
         {
-          shouldPlay:true,isLooping:false
+          shouldPlay: true,
+          isLooping: false
         },
         onPlaybackStatusUpdate,
       )
-      console.log("sound",status);
+      console.log("sound", status);
       onPlaybackStatusUpdate(status);
       setCurrentSound(sound);
       await sound.playAsync();
-    }catch(err){
+    } catch (err) {
       console.log(err.message);
     }
   };
   const onPlaybackStatusUpdate = async(status) => {
     console.log(status);
-    if(status.isLooded && status.isPlaying){
-      const progress = status.positionMillis - status.durationMillis;
-      console.log("progress",progress);
+    if (status.isLoaded && status.isPlaying) {
+      const progress = status.positionMillis / status.durationMillis;
+      console.log("progresss", progress);
       setProgress(progress);
       setCurrentTime(progress.positionMillis);
-      setTotalDuration(progress.durationMillis);
-    }
-
-  }
+      setTotalDuration(status.durationMillis);
+    } 
+  };
 
   console.log(currentTrack);
+
+  const circleSize = 12;
 
   return (
     <>
@@ -360,7 +362,36 @@ const LikedSongsScreen = () => {
               </View>
 
               <View style={{ marginTop: 10 }}>
-                <Text>Progress bar</Text>
+                <View
+                  style={{
+                    width: "100%",
+                    marginTop: 10,
+                    height: 3,
+                    backgroundColor: "gray",
+                    borderRadius: 5,
+                  }}
+                >
+                  <View
+                    style={[
+                      styles.progressbar,
+                      { width: `${progress * 100}%`},
+                    ]}
+                  />
+                  <View style={[
+                    {
+                      position: "absolute",
+                      top:-5,
+                      width: circleSize,
+                      height: circleSize,
+                      borderRadius: circleSize / 2,
+                      backgroundColor: "white"
+                    },
+                    {
+                      left: `${progress * 100}%`,
+                      marginLeft: -circleSize / 2,
+                    }
+                  ]} />
+                </View>
 
                 <View
                   style={{
@@ -370,9 +401,17 @@ const LikedSongsScreen = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Text style={{ color: "white", fontSize: 15 ,color:"#D3D3D3"}}>0:00</Text>
+                  <Text
+                    style={{ color: "white", fontSize: 15, color: "#D3D3D3" }}
+                  >
+                    0:00
+                  </Text>
 
-                  <Text style={{ color: "white", fontSize: 15 ,color:"#D3D3D3"}}>0:30</Text>
+                  <Text
+                    style={{ color: "white", fontSize: 15, color: "#D3D3D3" }}
+                  >
+                    0:30
+                  </Text>
                 </View>
               </View>
               <View
@@ -409,4 +448,9 @@ const LikedSongsScreen = () => {
 
 export default LikedSongsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  progressbar: {
+    height: "100%",
+    backgroundColor: "white",
+  },
+});
