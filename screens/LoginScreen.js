@@ -30,7 +30,7 @@ const LoginScreen = () => {
   }, []);
 
   async function authenticate() {
-    const redirectUri = "exp://192.168.0.103:8081/--/spotify-auth-callback";
+    const redirectUri = "exp://192.168.2.17:8081/--/spotify-auth-callback";
 
     // Cấu hình discovery với các endpoint cho Spotify
     const discovery = {
@@ -92,7 +92,7 @@ const LoginScreen = () => {
             marginTop: 40,
           }}
         >
-          Hàng triệu bài hát miễn phí trên Spotify!
+          Millions of Songs Free on spotify!
         </Text>
 
         <View style={{ height: 80 }} />
@@ -110,7 +110,7 @@ const LoginScreen = () => {
             marginVertical: 10,
           }}
         >
-          <Text>Đăng nhập với Spotify</Text>
+          <Text>Sign In with Spotify</Text>
         </Pressable>
 
         {/* Các tùy chọn đăng nhập khác */}

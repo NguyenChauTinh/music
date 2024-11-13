@@ -89,6 +89,9 @@ const LikedSongsScreen = () => {
     console.log(nextTrack);
     const preview_url = nextTrack?.track?.preview_url;
     try {
+      if (currentSound) {
+        await currentSound.stopAsync();
+      }
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
@@ -102,9 +105,8 @@ const LikedSongsScreen = () => {
           shouldPlay: true,
           isLooping: false,
         },
-        onPlaybackStatusUpdate
+        onPlaybackStatusUpdate,
       );
-      console.log("sound", status);
       onPlaybackStatusUpdate(status);
       setCurrentSound(sound);
       setIsPlaying(status.isLoaded);
@@ -122,9 +124,12 @@ const LikedSongsScreen = () => {
       setCurrentTime(status.positionMillis);
       setTotalDuration(status.durationMillis);
     }
-  };
 
-  console.log(currentTrack);
+    if (status.didJustFinish === true) {
+      setCurrentSound(null);
+      playNextTrack();
+    }
+  };
 
   const circleSize = 12;
 
@@ -144,6 +149,38 @@ const LikedSongsScreen = () => {
       setIsPlaying(!isPlaying);
     }
   };
+
+  const playNextTrack = async () => {
+    if(currentSound){
+      await currentSound.stopAsync();
+      setCurrentSound(null);
+    }
+    value.current +=1;
+    if(value.current < savedTracks.length){
+      const nextTrack = savedTracks[value.current]; //1
+      setCurrentTrack(nextTrack);
+
+      await play(nextTrack);
+    }else{
+      console.log("end of playlist");
+    }
+  }
+
+  const playPreviousTrack = async () => {
+    if(currentSound){
+      await currentSound.stopAsync();
+      setCurrentSound(null);
+    }
+    value.current -=1;
+    if(value.current < savedTracks.length){
+      const nextTrack = savedTracks[value.current]; //1
+      setCurrentTrack(nextTrack);
+
+      await play(nextTrack);
+    }else{
+      console.log("end of playlist");
+    }
+  }
 
   return (
     <>
@@ -262,8 +299,8 @@ const LikedSongsScreen = () => {
             renderItem={({ item }) => (
               <SongItem
                 item={item}
-                // onPress={play}
-                // isPlaying={item === currentTrack}
+                onPress={play}
+                isPlaying={item === currentTrack}
               />
             )}
           />
@@ -445,7 +482,7 @@ const LikedSongsScreen = () => {
                 <Pressable>
                   <FontAwesome name="arrows" size={30} color="#03C03C" />
                 </Pressable>
-                <Pressable>
+                <Pressable onPress={playPreviousTrack}>
                   <Ionicons name="play-skip-back" size={30} color="white" />
                 </Pressable>
                 <Pressable onPress={handlePlayPause}>
@@ -468,7 +505,7 @@ const LikedSongsScreen = () => {
                   )}
                  
                 </Pressable>
-                <Pressable>
+                <Pressable onPress={playNextTrack}>
                   <Ionicons name="play-skip-forward" size={30} color="white" />
                 </Pressable>
                 <Pressable>

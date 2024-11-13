@@ -5,15 +5,15 @@ import { Entypo } from "@expo/vector-icons";
 import { Player } from "../app/PlayerContext";
 
 const SongItem = ({ item, onPress, isPlaying }) => {
-  //   const { currentTrack, setCurrentTrack } = useContext(Player);
-  //   const handlePress = () => {
-  //     setCurrentTrack(item);
-  //     onPress(item);
-  //   };
+  const { currentTrack, setCurrentTrack } = useContext(Player);
+  const handlePress = () => {
+    setCurrentTrack(item);
+    onPress(item);
+  };
 
   return (
     <Pressable
-      //   onPress={handlePress}
+      onPress={handlePress}
       style={{ flexDirection: "row", alignItems: "center", padding: 10 }}
     >
       <Image
@@ -29,7 +29,7 @@ const SongItem = ({ item, onPress, isPlaying }) => {
               ? {
                   fontWeight: "bold",
                   fontSize: 14,
-                  color: "#3FFF00",
+                  color: "#3FFF00"
                 }
               : { fontWeight: "bold", fontSize: 14, color: "white" }
           }
@@ -46,7 +46,7 @@ const SongItem = ({ item, onPress, isPlaying }) => {
           flexDirection: "row",
           alignItems: "center",
           gap: 7,
-          marginHorizontal: 10,
+          marginHorizontal: 10
         }}
       >
         <AntDesign name="heart" size={24} color="#1DB954" />
