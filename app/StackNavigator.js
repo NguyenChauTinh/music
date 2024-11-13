@@ -8,6 +8,7 @@ import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import LoginScreen from "../screens/LoginScreen";
 import LikedSongsScreen from "../screens/LikedSongsScreen";
+import SongInfoScreen from "../screens/SongInfoScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -86,7 +87,7 @@ function Navigation() {
           component={LikedSongsScreen}
           options={{ headerShown: false }}
         />
-        {/* <Stack.Screen name="Info" component={SongInfoScreen} options={{headerShown:false}}/> */}
+        <Stack.Screen name="Info" component={SongInfoScreen} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
