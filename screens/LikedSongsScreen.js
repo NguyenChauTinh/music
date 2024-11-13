@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  ActivityIndicatorBase,
   FlatList,
   Image,
   Pressable,
@@ -7,7 +8,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,7 +37,7 @@ const LikedSongsScreen = () => {
     "#37306B",
     "#443C68",
     "#5B8FB9",
-    "#144272",
+    "#144272"
   ];
   const navigation = useNavigation();
   const [backgroundColor, setBackgroundColor] = useState("#0A2647");
@@ -58,11 +59,11 @@ const LikedSongsScreen = () => {
       "https://api.spotify.com/v1/me/tracks?offset=0&limit=50",
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
         params: {
-          limit: 50,
-        },
+          limit: 50
+        }
       }
     );
 
@@ -95,17 +96,17 @@ const LikedSongsScreen = () => {
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
-        shouldDuckAndroid: false,
+        shouldDuckAndroid: false
       });
       const { sound, status } = await Audio.Sound.createAsync(
         {
-          uri: preview_url,
+          uri: preview_url
         },
         {
           shouldPlay: true,
-          isLooping: false,
+          isLooping: false
         },
-        onPlaybackStatusUpdate,
+        onPlaybackStatusUpdate
       );
       onPlaybackStatusUpdate(status);
       setCurrentSound(sound);
@@ -150,38 +151,54 @@ const LikedSongsScreen = () => {
     }
   };
 
+  useEffect(() => {
+    if (savedTracks.length > 0) {
+      handleSearch(input);
+    }
+  }, [savedTracks]);
+
   const playNextTrack = async () => {
-    if(currentSound){
+    if (currentSound) {
       await currentSound.stopAsync();
       setCurrentSound(null);
     }
-    value.current +=1;
-    if(value.current < savedTracks.length){
+    value.current += 1;
+    if (value.current < savedTracks.length) {
       const nextTrack = savedTracks[value.current]; //1
       setCurrentTrack(nextTrack);
 
       await play(nextTrack);
-    }else{
+    } else {
       console.log("end of playlist");
     }
-  }
+  };
 
   const playPreviousTrack = async () => {
-    if(currentSound){
+    if (currentSound) {
       await currentSound.stopAsync();
       setCurrentSound(null);
     }
-    value.current -=1;
-    if(value.current < savedTracks.length){
+    value.current -= 1;
+    if (value.current < savedTracks.length) {
       const nextTrack = savedTracks[value.current]; //1
       setCurrentTrack(nextTrack);
 
       await play(nextTrack);
-    }else{
+    } else {
       console.log("end of playlist");
     }
+  };
+  const debouncedSearch = debounce(handleSearch, 800);
+  function handleSearch(text) {
+    const filteredTracks = savedTracks.filter((item) =>
+      item.track.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setSearchedTracks(filteredTracks);
   }
-
+  const handleInputChange = (text) => {
+    setInput(text);
+    debouncedSearch(text);
+  };
   return (
     <>
       <LinearGradient colors={["#614385", "#516395"]} style={{ flex: 1 }}>
@@ -199,7 +216,7 @@ const LikedSongsScreen = () => {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              marginTop: 9,
+              marginTop: 9
             }}
           >
             <Pressable
@@ -211,16 +228,16 @@ const LikedSongsScreen = () => {
                 padding: 9,
                 flex: 1,
                 borderRadius: 3,
-                height: 38,
+                height: 38
               }}
             >
               <AntDesign name="search1" size={20} color="white" />
               <TextInput
                 value={input}
-                // onChangeText={(text) => handleInputChange(text)}
+                onChangeText={(text) => handleInputChange(text)}
                 placeholder="Find in Liked songs"
                 placeholderTextColor={"white"}
-                style={{ fontWeight: "500", color: "white" }}
+                style={{ fontWeight: "500",color:"white" }}
               />
             </Pressable>
 
@@ -230,7 +247,7 @@ const LikedSongsScreen = () => {
                 backgroundColor: "#42275a",
                 padding: 10,
                 borderRadius: 3,
-                height: 38,
+                height: 38
               }}
             >
               <Text style={{ color: "white" }}>Sort</Text>
@@ -253,7 +270,7 @@ const LikedSongsScreen = () => {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              marginHorizontal: 10,
+              marginHorizontal: 10
             }}
           >
             <Pressable
@@ -263,7 +280,7 @@ const LikedSongsScreen = () => {
                 borderRadius: 15,
                 backgroundColor: "#1DB954",
                 justifyContent: "center",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <AntDesign name="arrowdown" size={20} color="white" />
@@ -285,7 +302,7 @@ const LikedSongsScreen = () => {
                   borderRadius: 30,
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor: "#1DB954",
+                  backgroundColor: "#1DB954"
                 }}
               >
                 <Entypo name="controller-play" size={24} color="white" />
@@ -293,17 +310,21 @@ const LikedSongsScreen = () => {
             </View>
           </Pressable>
 
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={savedTracks}
-            renderItem={({ item }) => (
-              <SongItem
-                item={item}
-                onPress={play}
-                isPlaying={item === currentTrack}
-              />
-            )}
-          />
+          {searchedTracks.length === 0 ? (
+            <ActivityIndicator size="large" color="gray" /> // Show a loading indicator while data is being fetched
+          ) : (
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={searchedTracks}
+              renderItem={({ item }) => (
+                <SongItem
+                  item={item}
+                  onPress={play}
+                  isPlaying={item === currentTrack}
+                />
+              )}	
+            />
+          )}
         </ScrollView>
       </LinearGradient>
 
@@ -324,7 +345,7 @@ const LikedSongsScreen = () => {
             justifyContent: "space-between",
             flexDirection: "row",
             alignItems: "center",
-            gap: 10,
+            gap: 10
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -338,7 +359,7 @@ const LikedSongsScreen = () => {
                 fontSize: 13,
                 width: 220,
                 color: "white",
-                fontWeight: "bold",
+                fontWeight: "bold"
               }}
             >
               {currentTrack?.track?.name} •{" "}
@@ -369,7 +390,7 @@ const LikedSongsScreen = () => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "space-between"
               }}
             >
               <AntDesign
@@ -399,7 +420,7 @@ const LikedSongsScreen = () => {
                 style={{
                   marginTop: 20,
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  justifyContent: "space-between"
                 }}
               >
                 <View>
@@ -423,13 +444,13 @@ const LikedSongsScreen = () => {
                     marginTop: 10,
                     height: 3,
                     backgroundColor: "gray",
-                    borderRadius: 5,
+                    borderRadius: 5
                   }}
                 >
                   <View
                     style={[
                       styles.progressbar,
-                      { width: `${progress * 100}%` },
+                      { width: `${progress * 100}%` }
                     ]}
                   />
                   <View
@@ -440,12 +461,12 @@ const LikedSongsScreen = () => {
                         width: circleSize,
                         height: circleSize,
                         borderRadius: circleSize / 2,
-                        backgroundColor: "white",
+                        backgroundColor: "white"
                       },
                       {
                         left: `${progress * 100}%`,
-                        marginLeft: -circleSize / 2,
-                      },
+                        marginLeft: -circleSize / 2
+                      }
                     ]}
                   />
                 </View>
@@ -455,7 +476,7 @@ const LikedSongsScreen = () => {
                     marginTop: 12,
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "space-between",
+                    justifyContent: "space-between"
                   }}
                 >
                   <Text
@@ -476,7 +497,7 @@ const LikedSongsScreen = () => {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginTop: 17,
+                  marginTop: 17
                 }}
               >
                 <Pressable>
@@ -497,13 +518,12 @@ const LikedSongsScreen = () => {
                         borderRadius: 30,
                         backgroundColor: "white",
                         justifyContent: "center",
-                        alignItems: "center",
+                        alignItems: "center"
                       }}
                     >
                       <Entypo name="controller-play" size={40} color="black" />
                     </Pressable>
                   )}
-                 
                 </Pressable>
                 <Pressable onPress={playNextTrack}>
                   <Ionicons name="play-skip-forward" size={30} color="white" />
@@ -525,6 +545,6 @@ export default LikedSongsScreen;
 const styles = StyleSheet.create({
   progressbar: {
     height: "100%",
-    backgroundColor: "white",
-  },
+    backgroundColor: "white"
+  }
 });
