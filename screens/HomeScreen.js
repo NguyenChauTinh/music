@@ -26,6 +26,8 @@ const HomeScreen = () => {
 
   const [followedArtists, setFollowedArtists] = useState([]);
 
+  const [trendingTracks, setTrendingTracks] = useState([]);
+
   const greetingMessage = () => {
     const currentTime = new Date().getHours();
     if (currentTime < 12) {
@@ -177,6 +179,70 @@ const HomeScreen = () => {
 
   // console.log(followedArtists);
 
+  const getTrendingTracks = async () => {
+    const accessToken = await AsyncStorage.getItem("token");
+    try {
+      const response = await axios.get(
+        "https://api.spotify.com/v1/browse/featured-playlists?limit=1",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const playlistId = response.data.playlists.items[0].id;
+
+      const tracksResponse = await axios.get(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setTrendingTracks(tracksResponse.data.items);
+    } catch (err) {
+      console.log("Error fetching trending tracks:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    getTrendingTracks();
+  }, []);
+
+  const renderTrendingTrack = ({ item }) => (
+    <Pressable
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#282828",
+        marginVertical: 8,
+        marginHorizontal: 10,
+        borderRadius: 8,
+        padding: 10,
+      }}
+    >
+      <Image
+        style={{ width: 55, height: 55, borderRadius: 4 }}
+        source={{ uri: item.track.album.images[0].url }}
+      />
+      <View style={{ marginLeft: 10 }}>
+        <Text
+          numberOfLines={1}
+          style={{ fontSize: 15, fontWeight: "bold", color: "white" }}
+        >
+          {item.track.name}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={{ fontSize: 13, color: "gray", marginTop: 4 }}
+        >
+          {item.track.artists.map((artist) => artist.name).join(", ")}
+        </Text>
+      </View>
+    </Pressable>
+  );
+
   return (
     <LinearGradient colors={["#040306", "#131624"]} style={{ flex: 1 }}>
       <ScrollView style={{ marginTop: 50 }}>
@@ -323,6 +389,25 @@ const HomeScreen = () => {
           numColumns={2}
           columnWrapperStyle={{ justifyContent: "space-between" }}
           nestedScrollEnabled={true}
+        />
+
+        <Text
+          style={{
+            color: "white",
+            fontSize: 19,
+            fontWeight: "bold",
+            marginHorizontal: 10,
+            marginTop: 20,
+          }}
+        >
+          Trending Tracks
+        </Text>
+        <FlatList
+          data={trendingTracks}
+          renderItem={renderTrendingTrack}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
         />
 
         <Text
