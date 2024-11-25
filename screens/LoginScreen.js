@@ -30,7 +30,8 @@ const LoginScreen = () => {
   }, []);
 
   async function authenticate() {
-    const redirectUri = "exp://192.168.2.17:8081/--/spotify-auth-callback";
+    // const redirectUri = "exp://192.168.2.17:8081/--/spotify-auth-callback";
+    const redirectUri = "exp://localhost:19002/--/spotify-auth-callback";
 
     // Cấu hình discovery với các endpoint cho Spotify
     const discovery = {
@@ -40,7 +41,8 @@ const LoginScreen = () => {
 
     // Tạo yêu cầu xác thực
     const authRequest = new AuthSession.AuthRequest({
-      clientId: "0a68c35563964c6eba600aa41015a705",
+      // clientId: "0a68c35563964c6eba600aa41015a705",
+      clientId: "01be9f4db03f4b4b9eadfac76c10edac",
       scopes: [
         "user-follow-read",
         "user-read-email",
