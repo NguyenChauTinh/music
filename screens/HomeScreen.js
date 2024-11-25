@@ -85,7 +85,7 @@ const HomeScreen = () => {
   async function handleArtistPress(artist) {
     const artistId = artist.id;
     console.log("Artist ID:", artistId);
-    navigation.navigate("Artist");
+    navigation.navigate("Artist", { artistId });
   }
 
   const renderItem = ({ item }) => {

@@ -261,9 +261,7 @@ const LikedSongsScreen = () => {
             <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
               Liked Songs
             </Text>
-            <Text style={{ color: "white", fontSize: 13, marginTop: 5 }}>
-              430 songs
-            </Text>
+            <Text style={{ color: "white", fontSize: 13, marginTop: 5 }}></Text>
           </View>
 
           <Pressable

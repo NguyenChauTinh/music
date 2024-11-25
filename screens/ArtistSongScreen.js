@@ -26,8 +26,12 @@ import { BottomModal } from "react-native-modals";
 import { ModalContent } from "react-native-modals";
 import { Audio } from "expo-av";
 import { debounce } from "lodash";
+import { useRoute } from "@react-navigation/native";
 
 const ArtistSongScreen = () => {
+  const route = useRoute(); // Hook để lấy thông tin điều hướng
+  const { artistId } = route.params; // Trích xuất artistId từ params
+
   const colors = [
     "#27374D",
     "#1D267D",
@@ -55,7 +59,7 @@ const ArtistSongScreen = () => {
 
   // Lấy danh sách bài hát của nghệ sĩ
 
-  const artistId = "1zSv9qZANOWB4HRE8sxeTL";
+  // const artistId = "1zSv9qZANOWB4HRE8sxeTL";
 
   async function getSavedTracks(artistId) {
     const accessToken = await AsyncStorage.getItem("token");
@@ -307,9 +311,9 @@ const ArtistSongScreen = () => {
             <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
               Artist Songs
             </Text>
-            <Text style={{ color: "white", fontSize: 13, marginTop: 5 }}>
+            {/* <Text style={{ color: "white", fontSize: 13, marginTop: 5 }}>
               430 songs
-            </Text>
+            </Text> */}
           </View>
 
           <Pressable
@@ -366,6 +370,7 @@ const ArtistSongScreen = () => {
               renderItem={({ item }) => (
                 <SongItemArtist
                   item={item}
+                  index={searchedTracks.indexOf(item)}
                   onPress={play}
                   isPlaying={item === currentTrack}
                 />
@@ -414,9 +419,25 @@ const ArtistSongScreen = () => {
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <AntDesign name="heart" size={24} color="#1DB954" />
-            <Pressable>
-              <AntDesign name="pausecircle" size={24} color="white" />
+            {/* <AntDesign name="heart" size={24} color="#1DB954" /> */}
+            <Pressable onPress={handlePlayPause}>
+              {isPlaying ? (
+                <Feather name="pause-circle" size={34} color="white" />
+              ) : (
+                <Pressable
+                  onPress={handlePlayPause}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 30,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Entypo name="controller-play" size={24} color="black" />
+                </Pressable>
+              )}
             </Pressable>
           </View>
         </Pressable>

@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React, { useContext } from "react";
-import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Player } from "../app/PlayerContext";
 
-const SongItem = ({ item, onPress, isPlaying }) => {
+const SongItem = ({ item, onPress, isPlaying, index }) => {
   const { currentTrack, setCurrentTrack } = useContext(Player);
+
   const handlePress = () => {
     setCurrentTrack(item);
     onPress(item);
@@ -16,11 +16,30 @@ const SongItem = ({ item, onPress, isPlaying }) => {
       onPress={handlePress}
       style={{ flexDirection: "row", alignItems: "center", padding: 10 }}
     >
-      <Image
-        style={{ width: 50, height: 50, marginRight: 10 }}
-        source={{ uri: item?.track?.album?.images[0].url }}
-      />
+      {/* Số thứ tự */}
+      <Text
+        style={{
+          color: "white",
+          fontWeight: "bold",
+          fontSize: 16,
+          width: 50, // Đặt độ rộng cố định để căn chỉnh
+          textAlign: "center",
+          paddingRight: 10,
+        }}
+      >
+        {index + 1}
+      </Text>
+      {/* Hình ảnh */}
 
+      {/* <Image
+        style={{ width: 50, height: 50, marginRight: 10 }}
+        source={{
+          uri:
+            item?.track?.album?.images[0]?.url ||
+            "https://play-lh.googleusercontent.com/D9X7m5dTNzjeSPxBqzh1RwrZLXJDFTpht9-8W8RJtiaOAlFxNvL5MnSDRxoDnQRYhz0=w240-h480-rw", // URL hình ảnh mặc định
+        }}
+      /> */}
+      {/* Thông tin bài hát */}
       <View style={{ flex: 1 }}>
         <Text
           numberOfLines={1}
@@ -37,10 +56,10 @@ const SongItem = ({ item, onPress, isPlaying }) => {
           {item?.name}
         </Text>
         <Text style={{ marginTop: 4, color: "#989898" }}>
-          {item?.artists[0].name}
+          {item?.artists[0]?.name}
         </Text>
       </View>
-
+      {/* Menu tùy chọn */}
       <View
         style={{
           flexDirection: "row",
@@ -49,7 +68,6 @@ const SongItem = ({ item, onPress, isPlaying }) => {
           marginHorizontal: 10,
         }}
       >
-        <AntDesign name="heart" size={24} color="#1DB954" />
         <Entypo name="dots-three-vertical" size={24} color="#C0C0C0" />
       </View>
     </Pressable>
