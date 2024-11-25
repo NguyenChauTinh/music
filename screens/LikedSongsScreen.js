@@ -369,9 +369,25 @@ const LikedSongsScreen = () => {
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <AntDesign name="heart" size={24} color="#1DB954" />
-            <Pressable>
-              <AntDesign name="pausecircle" size={24} color="white" />
+            {/* <AntDesign name="heart" size={24} color="#1DB954" /> */}
+            <Pressable onPress={handlePlayPause}>
+              {isPlaying ? (
+                <Feather name="pause-circle" size={34} color="white" />
+              ) : (
+                <Pressable
+                  onPress={handlePlayPause}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 30,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Entypo name="controller-play" size={24} color="black" />
+                </Pressable>
+              )}
             </Pressable>
           </View>
         </Pressable>

@@ -20,7 +20,7 @@ import { Feather, FontAwesome } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import SongItem from "../components/SongItem";
+import SongItemArtist from "../components/SongItemArtist";
 import { Player } from "../app/PlayerContext";
 import { BottomModal } from "react-native-modals";
 import { ModalContent } from "react-native-modals";
@@ -55,19 +55,17 @@ const ArtistSongScreen = () => {
 
   // Lấy danh sách bài hát của nghệ sĩ
 
-  const artistId = "5dfZ5uSmzR7VQK0udbAVpf";
+  const artistId = "1zSv9qZANOWB4HRE8sxeTL";
 
   async function getSavedTracks(artistId) {
     const accessToken = await AsyncStorage.getItem("token");
 
-    // Kiểm tra nếu không có token
     if (!accessToken) {
       console.error("No access token found.");
       return;
     }
 
     try {
-      // Lấy danh sách album của nghệ sĩ
       const albumResponse = await fetch(
         `https://api.spotify.com/v1/artists/${artistId}/albums`,
         {
@@ -77,7 +75,6 @@ const ArtistSongScreen = () => {
         }
       );
 
-      // Kiểm tra lỗi trong khi lấy album
       if (!albumResponse.ok) {
         console.error(`Error fetching albums: ${albumResponse.statusText}`);
         throw new Error(`Failed to fetch albums: ${albumResponse.status}`);
@@ -85,10 +82,8 @@ const ArtistSongScreen = () => {
 
       const albumData = await albumResponse.json();
 
-      // Lưu tất cả bài hát
       let allTracks = [];
 
-      // Duyệt qua tất cả album và lấy bài hát trong mỗi album
       for (let album of albumData.items) {
         const trackResponse = await fetch(
           `https://api.spotify.com/v1/albums/${album.id}/tracks`,
@@ -99,26 +94,24 @@ const ArtistSongScreen = () => {
           }
         );
 
-        // Kiểm tra lỗi trong khi lấy track
         if (!trackResponse.ok) {
           console.error(`Error fetching tracks for album ${album.id}`);
-          continue; // Bỏ qua album nếu không lấy được tracks
+          continue;
         }
 
         const trackData = await trackResponse.json();
-        allTracks = [...allTracks, ...trackData.items]; // Ghép bài hát vào danh sách tổng
-
-        // console.log(
-        //   `Fetched ${trackData.items.length} tracks from album ${album.name}`
-        // );
+        // Chỉ thêm các bài hát có preview_url
+        const tracksWithPreview = trackData.items.filter(
+          (track) => track.preview_url
+        );
+        allTracks = [...allTracks, ...tracksWithPreview];
       }
 
-      // Kiểm tra có bài hát không
       if (allTracks.length > 0) {
-        console.log("All tracks fetched:", allTracks);
-        setSavedTracks(allTracks); // Cập nhật state với tất cả bài hát
+        console.log("All tracks with preview_url fetched:", allTracks);
+        setSavedTracks(allTracks);
       } else {
-        console.log("No tracks found for this artist.");
+        console.log("No tracks with preview_url found for this artist.");
       }
     } catch (error) {
       console.error("Error in API request:", error.message);
@@ -129,7 +122,7 @@ const ArtistSongScreen = () => {
     getSavedTracks(artistId);
   }, []);
 
-  console.log(savedTracks);
+  // console.log(savedTracks);
 
   const playTrack = async () => {
     if (savedTracks.length > 0) {
@@ -139,8 +132,9 @@ const ArtistSongScreen = () => {
   };
 
   const play = async (nextTrack) => {
-    console.log(nextTrack);
-    const preview_url = nextTrack?.track?.preview_url;
+    // console.log(nextTrack);
+    const preview_url = nextTrack.preview_url;
+    console.log("preview_url", preview_url);
     try {
       if (currentSound) {
         await currentSound.stopAsync();
@@ -245,7 +239,7 @@ const ArtistSongScreen = () => {
     const filteredTracks = savedTracks.filter((item) =>
       item.name.toLowerCase().includes(text.toLowerCase())
     );
-    console.log(filteredTracks);
+    // console.log(filteredTracks);
     setSearchedTracks(filteredTracks);
   }
   const handleInputChange = (text) => {
@@ -370,7 +364,7 @@ const ArtistSongScreen = () => {
               showsVerticalScrollIndicator={false}
               data={searchedTracks}
               renderItem={({ item }) => (
-                <SongItem
+                <SongItemArtist
                   item={item}
                   onPress={play}
                   isPlaying={item === currentTrack}
@@ -404,7 +398,7 @@ const ArtistSongScreen = () => {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Image
               style={{ width: 40, height: 40 }}
-              source={{ uri: currentTrack?.track?.album?.images[0].url }}
+              source={{ uri: currentTrack?.album?.images[0].url }}
             />
             <Text
               numberOfLines={1}
@@ -415,8 +409,7 @@ const ArtistSongScreen = () => {
                 fontWeight: "bold",
               }}
             >
-              {currentTrack?.track.name} •{" "}
-              {currentTrack?.track?.artists[0].name}
+              {currentTrack?.name} • {currentTrack?.artists[0].name}
             </Text>
           </View>
 
@@ -456,7 +449,7 @@ const ArtistSongScreen = () => {
               <Text
                 style={{ fontSize: 14, fontWeight: "bold", color: "white" }}
               >
-                {currentTrack?.track.name}
+                {currentTrack?.name}
               </Text>
 
               <Entypo name="dots-three-vertical" size={24} color="white" />
@@ -467,7 +460,7 @@ const ArtistSongScreen = () => {
             <View style={{ padding: 10 }}>
               <Image
                 style={{ width: "100%", height: 330, borderRadius: 4 }}
-                source={{ uri: currentTrack?.track?.album?.images[0].url }}
+                source={{ uri: currentTrack?.album?.images[0].url }}
               />
               <View
                 style={{
@@ -480,10 +473,10 @@ const ArtistSongScreen = () => {
                   <Text
                     style={{ fontSize: 18, fontWeight: "bold", color: "white" }}
                   >
-                    {currentTrack?.track.name}
+                    {currentTrack?.name}
                   </Text>
                   <Text style={{ color: "#D3D3D3", marginTop: 4 }}>
-                    {currentTrack?.track?.artists[0].name}
+                    {currentTrack?.artists[0].name}
                   </Text>
                 </View>
 

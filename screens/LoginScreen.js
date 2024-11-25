@@ -52,6 +52,8 @@ const LoginScreen = () => {
         "playlist-read-private",
         "playlist-read-collaborative",
         "playlist-modify-public",
+        "user-read-playback-position",
+        "user-read-private",
       ],
       redirectUri,
       responseType: AuthSession.ResponseType.Token,

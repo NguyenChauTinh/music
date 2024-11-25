@@ -34,10 +34,10 @@ const SongItem = ({ item, onPress, isPlaying }) => {
               : { fontWeight: "bold", fontSize: 14, color: "white" }
           }
         >
-          {item?.track?.name}
+          {item?.name}
         </Text>
         <Text style={{ marginTop: 4, color: "#989898" }}>
-          {item?.track?.artists[0].name}
+          {item?.artists[0].name}
         </Text>
       </View>
 
