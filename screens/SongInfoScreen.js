@@ -1,9 +1,21 @@
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons,AntDesign,MaterialCommunityIcons,Entypo } from "@expo/vector-icons";
+import {
+  Ionicons,
+  AntDesign,
+  MaterialCommunityIcons,
+  Entypo,
+} from "@expo/vector-icons";
 
 const SongInfoScreen = () => {
   const route = useRoute();
@@ -85,69 +97,89 @@ const SongInfoScreen = () => {
           ))}
         </View>
         <Pressable
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginHorizontal: 10,
+          }}
+        >
+          <Pressable
             style={{
-              flexDirection: "row",
+              width: 30,
+              height: 30,
+              borderRadius: 15,
+              backgroundColor: "#1DB954",
+              justifyContent: "center",
               alignItems: "center",
-              justifyContent: "space-between",
-              marginHorizontal: 10,
             }}
           >
-            <Pressable
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15,
-                backgroundColor: "#1DB954",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <AntDesign name="arrowdown" size={20} color="white" />
-            </Pressable>
-
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
-            >
-              <MaterialCommunityIcons
-                name="cross-bolnisi"
-                size={24}
-                color="#1DB954"
-              />
-              <Pressable
-           
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#1DB954",
-                }}
-              >
-                <Entypo name="controller-play" size={24} color="white" />
-              </Pressable>
-            </View>
+            <AntDesign name="arrowdown" size={20} color="white" />
           </Pressable>
 
-          <View>
-              <View style={{marginTop:10,marginHorizontal:12}}>
-                  {tracks?.map((track,index) => (
-                      <Pressable style={{marginVertical:10,flexDirection:"row",justifyContent:"space-between"}}>
-                          <View>
-                              <Text style={{fontSize:16,fontWeight:"500",color:"white"}}>{track?.name}</Text>
-                              <View style={{flexDirection:"row",alignItems:"center",gap:8,marginTop:5}}>
-                                  {track?.artists?.map((item,index) => (
-                                      <Text style={{fontSize:16,fontWeight:"500",color:"gray"}}>{item?.name}</Text>
-                                  ))}
-                              </View>
-
-                          </View>
-                          <Entypo name="dots-three-vertical" size={24} color="white" />
-                      </Pressable>
-                  ))}
-              </View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <MaterialCommunityIcons
+              name="cross-bolnisi"
+              size={24}
+              color="#1DB954"
+            />
+            <Pressable
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#1DB954",
+              }}
+            >
+              <Entypo name="controller-play" size={24} color="white" />
+            </Pressable>
           </View>
+        </Pressable>
 
+        <View>
+          <View style={{ marginTop: 10, marginHorizontal: 12 }}>
+            {tracks?.map((track, index) => (
+              <Pressable
+                style={{
+                  marginVertical: 10,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <View>
+                  <Text
+                    style={{ fontSize: 16, fontWeight: "500", color: "white" }}
+                  >
+                    {track?.name}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                      marginTop: 5,
+                    }}
+                  >
+                    {track?.artists?.map((item, index) => (
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: "500",
+                          color: "gray",
+                        }}
+                      >
+                        {item?.name}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+                <Entypo name="dots-three-vertical" size={24} color="white" />
+              </Pressable>
+            ))}
+          </View>
+        </View>
       </ScrollView>
     </LinearGradient>
   );

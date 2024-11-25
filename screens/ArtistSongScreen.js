@@ -27,7 +27,7 @@ import { ModalContent } from "react-native-modals";
 import { Audio } from "expo-av";
 import { debounce } from "lodash";
 
-const LikedSongsScreen = () => {
+const ArtistSongScreen = () => {
   const colors = [
     "#27374D",
     "#1D267D",
@@ -53,31 +53,83 @@ const LikedSongsScreen = () => {
   const [totalDuration, setTotalDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  async function getSavedTracks() {
-    const accessToken = await AsyncStorage.getItem("token");
-    const response = await fetch(
-      "https://api.spotify.com/v1/me/tracks?offset=0&limit=50",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        params: {
-          limit: 50,
-        },
-      }
-    );
+  // Lấy danh sách bài hát của nghệ sĩ
 
-    if (!response.ok) {
-      throw new Error("failed to fetch the tracks");
+  const artistId = "5dfZ5uSmzR7VQK0udbAVpf";
+
+  async function getSavedTracks(artistId) {
+    const accessToken = await AsyncStorage.getItem("token");
+
+    // Kiểm tra nếu không có token
+    if (!accessToken) {
+      console.error("No access token found.");
+      return;
     }
-    const data = await response.json();
-    setSavedTracks(data.items);
+
+    try {
+      // Lấy danh sách album của nghệ sĩ
+      const albumResponse = await fetch(
+        `https://api.spotify.com/v1/artists/${artistId}/albums`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      // Kiểm tra lỗi trong khi lấy album
+      if (!albumResponse.ok) {
+        console.error(`Error fetching albums: ${albumResponse.statusText}`);
+        throw new Error(`Failed to fetch albums: ${albumResponse.status}`);
+      }
+
+      const albumData = await albumResponse.json();
+
+      // Lưu tất cả bài hát
+      let allTracks = [];
+
+      // Duyệt qua tất cả album và lấy bài hát trong mỗi album
+      for (let album of albumData.items) {
+        const trackResponse = await fetch(
+          `https://api.spotify.com/v1/albums/${album.id}/tracks`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        // Kiểm tra lỗi trong khi lấy track
+        if (!trackResponse.ok) {
+          console.error(`Error fetching tracks for album ${album.id}`);
+          continue; // Bỏ qua album nếu không lấy được tracks
+        }
+
+        const trackData = await trackResponse.json();
+        allTracks = [...allTracks, ...trackData.items]; // Ghép bài hát vào danh sách tổng
+
+        // console.log(
+        //   `Fetched ${trackData.items.length} tracks from album ${album.name}`
+        // );
+      }
+
+      // Kiểm tra có bài hát không
+      if (allTracks.length > 0) {
+        console.log("All tracks fetched:", allTracks);
+        setSavedTracks(allTracks); // Cập nhật state với tất cả bài hát
+      } else {
+        console.log("No tracks found for this artist.");
+      }
+    } catch (error) {
+      console.error("Error in API request:", error.message);
+    }
   }
+
   useEffect(() => {
-    getSavedTracks();
+    getSavedTracks(artistId);
   }, []);
 
-  // console.log(savedTracks);
+  console.log(savedTracks);
 
   const playTrack = async () => {
     if (savedTracks.length > 0) {
@@ -191,7 +243,7 @@ const LikedSongsScreen = () => {
   const debouncedSearch = debounce(handleSearch, 800);
   function handleSearch(text) {
     const filteredTracks = savedTracks.filter((item) =>
-      item.track.name.toLowerCase().includes(text.toLowerCase())
+      item.name.toLowerCase().includes(text.toLowerCase())
     );
     console.log(filteredTracks);
     setSearchedTracks(filteredTracks);
@@ -259,7 +311,7 @@ const LikedSongsScreen = () => {
 
           <View style={{ marginHorizontal: 10 }}>
             <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
-              Liked Songs
+              Artist Songs
             </Text>
             <Text style={{ color: "white", fontSize: 13, marginTop: 5 }}>
               430 songs
@@ -363,7 +415,7 @@ const LikedSongsScreen = () => {
                 fontWeight: "bold",
               }}
             >
-              {currentTrack?.track?.name} •{" "}
+              {currentTrack?.track.name} •{" "}
               {currentTrack?.track?.artists[0].name}
             </Text>
           </View>
@@ -404,7 +456,7 @@ const LikedSongsScreen = () => {
               <Text
                 style={{ fontSize: 14, fontWeight: "bold", color: "white" }}
               >
-                {currentTrack?.track?.name}
+                {currentTrack?.track.name}
               </Text>
 
               <Entypo name="dots-three-vertical" size={24} color="white" />
@@ -428,7 +480,7 @@ const LikedSongsScreen = () => {
                   <Text
                     style={{ fontSize: 18, fontWeight: "bold", color: "white" }}
                   >
-                    {currentTrack?.track?.name}
+                    {currentTrack?.track.name}
                   </Text>
                   <Text style={{ color: "#D3D3D3", marginTop: 4 }}>
                     {currentTrack?.track?.artists[0].name}
@@ -541,7 +593,7 @@ const LikedSongsScreen = () => {
   );
 };
 
-export default LikedSongsScreen;
+export default ArtistSongScreen;
 
 const styles = StyleSheet.create({
   progressbar: {

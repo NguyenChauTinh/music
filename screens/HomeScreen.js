@@ -82,6 +82,12 @@ const HomeScreen = () => {
 
   // console.log(recentlyplayed);
 
+  async function handleArtistPress(artist) {
+    const artistId = artist.id;
+    console.log("Artist ID:", artistId);
+    navigation.navigate("Artist");
+  }
+
   const renderItem = ({ item }) => {
     return (
       <Pressable
@@ -332,7 +338,9 @@ const HomeScreen = () => {
         </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {followedArtists.map((item, index) => (
-            <ArtistCard item={item} key={index} />
+            <Pressable key={index} onPress={() => handleArtistPress(item)}>
+              <ArtistCard item={item} />
+            </Pressable>
           ))}
         </ScrollView>
 
