@@ -61,9 +61,6 @@ const LikedSongsScreen = () => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-        params: {
-          limit: 50,
-        },
       }
     );
 
@@ -71,6 +68,7 @@ const LikedSongsScreen = () => {
       throw new Error("failed to fetch the tracks");
     }
     const data = await response.json();
+    
     setSavedTracks(data.items);
   }
   useEffect(() => {
@@ -88,7 +86,8 @@ const LikedSongsScreen = () => {
 
   const play = async (nextTrack) => {
     console.log(nextTrack);
-    const preview_url = nextTrack?.track?.preview_url;
+    const preview_url = "https://drive.google.com/uc?export=download&id=1F5UWcQ2ZoyxypaBN1qy5hcgLJCQKU8om";  // Thay link ở đây
+  
     try {
       if (currentSound) {
         await currentSound.stopAsync();
@@ -100,7 +99,7 @@ const LikedSongsScreen = () => {
       });
       const { sound, status } = await Audio.Sound.createAsync(
         {
-          uri: preview_url,
+          uri: preview_url,  // Dùng link tải trực tiếp ở đây
         },
         {
           shouldPlay: true,
@@ -116,6 +115,7 @@ const LikedSongsScreen = () => {
       console.log(err.message);
     }
   };
+  
   const onPlaybackStatusUpdate = async (status) => {
     console.log(status);
     if (status.isLoaded && status.isPlaying) {
