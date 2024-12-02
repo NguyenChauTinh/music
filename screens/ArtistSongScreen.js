@@ -105,10 +105,12 @@ const ArtistSongScreen = () => {
 
         const trackData = await trackResponse.json();
         // Chỉ thêm các bài hát có preview_url
-        const tracksWithPreview = trackData.items.filter(
-          (track) => track.preview_url
-        );
-        allTracks = [...allTracks, ...tracksWithPreview];
+        // const tracksWithPreview = trackData.items.filter(
+        //   (track) => track.preview_url
+        // );
+        // allTracks = [...allTracks, ...tracksWithPreview];
+        allTracks = [...allTracks, ...trackData.items];
+
       }
 
       if (allTracks.length > 0) {
