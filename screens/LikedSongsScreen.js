@@ -55,41 +55,66 @@ const LikedSongsScreen = () => {
   const [totalDuration, setTotalDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  async function getSavedTracks() {
-    const accessToken = await AsyncStorage.getItem("token");
-    const response = await fetch(
-      "https://api.spotify.com/v1/me/tracks?offset=0&limit=50",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+  const fetchh = require('isomorphic-unfetch')
+  const { getData, getPreview, getTracks, getDetails } =
+  require('spotify-url-info')(fetchh)
+  const [trendingTracks, setTrendingTracks] = useState([]);
 
-    if (!response.ok) {
-      throw new Error("failed to fetch the tracks");
-    }
-    const data = await response.json();
+  global.Buffer = Buffer;
+
+  // async function getSavedTracks() {
+  //   const accessToken = await AsyncStorage.getItem("token");
+  //   const response = await fetch(
+  //     "https://api.spotify.com/v1/me/tracks?offset=0&limit=50",
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     }
+  //   );
+
+  //   if (!response.ok) {
+  //     throw new Error("failed to fetch the tracks");
+  //   }
+  //   const data = await response.json();
     
-    setSavedTracks(data.items);
-  }
-  useEffect(() => {
-    getSavedTracks();
-  }, []);
+  //   setSavedTracks(data.items);
+  // }
+  // useEffect(() => {
+  //   getSavedTracks();
+  // }, []);
+
+  const getTrendingTracks = async () => {
+    const playlistUrl = "https://open.spotify.com/playlist/1dwSo4UbntD8UvmiHcZpVM";
+  
+    try {
+      const tracks = await getTracks(playlistUrl, { fetch: fetchh }); // Sử dụng fetchh từ isomorphic-unfetch
+      const first10Tracks = tracks.slice(0, 30); // Chỉ lấy 10 bài hát đầu tiên
+      console.log("First 10 tracks:", first10Tracks);
+      setTrendingTracks(first10Tracks); // Lưu kết quả vào state
+    } catch (error) {
+        console.error("Error fetching tracks:", error.message);
+    }
+    };
+
+  
+    useEffect(() => {
+      getTrendingTracks();
+    }, []);
 
   // console.log(savedTracks);
 
   const playTrack = async () => {
-    if (savedTracks.length > 0) {
-      setCurrentTrack(savedTracks[0]);
+    if (trendingTracks.length > 0) {
+      setCurrentTrack(trendingTracks[0]);
     }
-    await play(savedTracks[0]);
+    await play(trendingTracks[0]);
   };
 
   const play = async (nextTrack) => {
-    console.log(nextTrack);
-    const preview_url = "https://drive.google.com/uc?export=download&id=1F5UWcQ2ZoyxypaBN1qy5hcgLJCQKU8om";  // Thay link ở đây
-  
+    const previewUrl = nextTrack.previewUrl;
+    console.log("previewUrl", previewUrl);
+
     try {
       if (currentSound) {
         await currentSound.stopAsync();
@@ -101,7 +126,7 @@ const LikedSongsScreen = () => {
       });
       const { sound, status } = await Audio.Sound.createAsync(
         {
-          uri: preview_url,  // Dùng link tải trực tiếp ở đây
+          uri: previewUrl,
         },
         {
           shouldPlay: true,
@@ -154,10 +179,10 @@ const LikedSongsScreen = () => {
   };
 
   useEffect(() => {
-    if (savedTracks.length > 0) {
+    if (trendingTracks.length > 0) {
       handleSearch(input);
     }
-  }, [savedTracks]);
+  }, [trendingTracks]);
 
   const playNextTrack = async () => {
     if (currentSound) {
@@ -165,8 +190,8 @@ const LikedSongsScreen = () => {
       setCurrentSound(null);
     }
     value.current += 1;
-    if (value.current < savedTracks.length) {
-      const nextTrack = savedTracks[value.current]; //1
+    if (value.current < trendingTracks.length) {
+      const nextTrack = trendingTracks[value.current]; //1
       setCurrentTrack(nextTrack);
 
       await play(nextTrack);
@@ -181,8 +206,8 @@ const LikedSongsScreen = () => {
       setCurrentSound(null);
     }
     value.current -= 1;
-    if (value.current < savedTracks.length) {
-      const nextTrack = savedTracks[value.current]; //1
+    if (value.current < trendingTracks.length) {
+      const nextTrack = trendingTracks[value.current]; //1
       setCurrentTrack(nextTrack);
 
       await play(nextTrack);
@@ -192,8 +217,8 @@ const LikedSongsScreen = () => {
   };
   const debouncedSearch = debounce(handleSearch, 800);
   function handleSearch(text) {
-    const filteredTracks = savedTracks.filter((item) =>
-      item.track.name.toLowerCase().includes(text.toLowerCase())
+    const filteredTracks = trendingTracks.filter((item) =>
+      item.name.toLowerCase().includes(text.toLowerCase())
     );
     console.log(filteredTracks);
     setSearchedTracks(filteredTracks);
@@ -352,7 +377,7 @@ const LikedSongsScreen = () => {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Image
               style={{ width: 40, height: 40 }}
-              source={{ uri: currentTrack?.track?.album?.images[0].url }}
+              source={{ uri: "https://sctt.net.vn/wp-content/uploads/2021/06/spotify_hero_4-1024x474.jpg" }}
             />
             <Text
               numberOfLines={1}
@@ -363,8 +388,8 @@ const LikedSongsScreen = () => {
                 fontWeight: "bold",
               }}
             >
-              {currentTrack?.track?.name} •{" "}
-              {currentTrack?.track?.artists[0].name}
+              {currentTrack?.name} •{" "}
+              {currentTrack?.artist}
             </Text>
           </View>
 
@@ -420,7 +445,7 @@ const LikedSongsScreen = () => {
               <Text
                 style={{ fontSize: 14, fontWeight: "bold", color: "white" }}
               >
-                {currentTrack?.track?.name}
+                {currentTrack?.name}
               </Text>
 
               <Entypo name="dots-three-vertical" size={24} color="white" />
@@ -431,7 +456,7 @@ const LikedSongsScreen = () => {
             <View style={{ padding: 10 }}>
               <Image
                 style={{ width: "100%", height: 330, borderRadius: 4 }}
-                source={{ uri: currentTrack?.track?.album?.images[0].url }}
+                source={{ uri: "https://sctt.net.vn/wp-content/uploads/2021/06/spotify_hero_4-1024x474.jpg"}}
               />
               <View
                 style={{

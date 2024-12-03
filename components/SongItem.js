@@ -18,7 +18,7 @@ const SongItem = ({ item, onPress, isPlaying }) => {
     >
       <Image
         style={{ width: 50, height: 50, marginRight: 10 }}
-        source={{ uri: item?.track?.album?.images[0].url }}
+        source={{ uri: "https://sctt.net.vn/wp-content/uploads/2021/06/spotify_hero_4-1024x474.jpg" }}
       />
 
       <View style={{ flex: 1 }}>
@@ -34,10 +34,10 @@ const SongItem = ({ item, onPress, isPlaying }) => {
               : { fontWeight: "bold", fontSize: 14, color: "white" }
           }
         >
-          {item?.track?.name}
+          {item?.name}
         </Text>
         <Text style={{ marginTop: 4, color: "#989898" }}>
-          {item?.track?.artists[0].name}
+          {item?.artist.name}
         </Text>
       </View>
 
