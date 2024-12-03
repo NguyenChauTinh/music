@@ -18,15 +18,26 @@ import ArtistCard from "../components/ArtistCard";
 import RecentlyPlayedCard from "../components/RecentlyPlayedCard";
 import { useNavigation } from "@react-navigation/native";
 
+// import fetchh from "isomorphic-unfetch";
+// import spotifyUrlInfo from 'spotify-url-info';
+
+import { Buffer } from 'buffer';
+
 const HomeScreen = () => {
   const [userProfile, setUserProfile] = useState();
   const navigation = useNavigation();
   const [recentlyplayed, setRecentlyPlayed] = useState([]);
   const [topArtists, setTopArtists] = useState([]);
-
   const [followedArtists, setFollowedArtists] = useState([]);
-
   const [trendingTracks, setTrendingTracks] = useState([]);
+
+  const fetchh = require('isomorphic-unfetch')
+  const { getData, getPreview, getTracks, getDetails } =
+  require('spotify-url-info')(fetchh)
+
+  global.Buffer = Buffer;
+  
+
 
   const greetingMessage = () => {
     const currentTime = new Date().getHours();
@@ -179,31 +190,34 @@ const HomeScreen = () => {
 
   // console.log(followedArtists);
 
-  const getTrendingTracks = async () => {
-    const accessToken = await AsyncStorage.getItem("token");
-    try {
-      const response = await axios.get(
-        "https://api.spotify.com/v1/browse/featured-playlists?limit=1",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const playlistId = response.data.playlists.items[0].id;
+//   const getTrendingTracks = async () => {
+//     const playlistUrl = 'https://open.spotify.com/playlist/1dwSo4UbntD8UvmiHcZpVM';
+//     console.log('Fetching playlist:', playlistUrl);
+    
+//     try {
+//         const data = await getPreview(playlistUrl);
+//         console.log('Fetched data:', data);
+//         if (!data) {
+//             console.log('No data returned');
+//         }
+//     } catch (error) {
+//         console.error('Error fetching data:', error);
+//     }
+// };
 
-      const tracksResponse = await axios.get(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      setTrendingTracks(tracksResponse.data.items);
-    } catch (err) {
-      console.log("Error fetching trending tracks:", err.message);
-    }
+
+
+const getTrendingTracks = async () => {
+  const playlistUrl = "https://open.spotify.com/playlist/1dwSo4UbntD8UvmiHcZpVM";
+
+  try {
+    const tracks = await getTracks(playlistUrl, { fetch: fetchh }); // Sử dụng fetchh từ isomorphic-unfetch
+    const first10Tracks = tracks.slice(0, 10); // Chỉ lấy 10 bài hát đầu tiên
+    console.log("First 10 tracks:", first10Tracks);
+    setTrendingTracks(first10Tracks); // Lưu kết quả vào state
+  } catch (error) {
+      console.error("Error fetching tracks:", error.message);
+  }
   };
 
   useEffect(() => {
@@ -212,36 +226,72 @@ const HomeScreen = () => {
 
   const renderTrendingTrack = ({ item }) => (
     <Pressable
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#282828",
-        marginVertical: 8,
-        marginHorizontal: 10,
-        borderRadius: 8,
-        padding: 10,
-      }}
+        style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#282828",
+            marginVertical: 8,
+            marginHorizontal: 10,
+            borderRadius: 8,
+            padding: 10,
+        }}
     >
-      <Image
-        style={{ width: 55, height: 55, borderRadius: 4 }}
-        source={{ uri: item.track.album.images[0].url }}
-      />
-      <View style={{ marginLeft: 10 }}>
-        <Text
-          numberOfLines={1}
-          style={{ fontSize: 15, fontWeight: "bold", color: "white" }}
-        >
-          {item.track.name}
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={{ fontSize: 13, color: "gray", marginTop: 4 }}
-        >
-          {item.track.artists.map((artist) => artist.name).join(", ")}
-        </Text>
-      </View>
+        <Image
+            style={{ width: 55, height: 55, borderRadius: 4 }}
+            source={{ uri: item.coverArt }} // Sử dụng đúng field trả về từ `getTracks`
+        />
+        <View style={{ marginLeft: 10 }}>
+            <Text
+                numberOfLines={1}
+                style={{ fontSize: 15, fontWeight: "bold", color: "white" }}
+            >
+                {item.name}
+            </Text>
+            <Text
+                numberOfLines={1}
+                style={{ fontSize: 13, color: "gray", marginTop: 4 }}
+            >
+                {item.artist}
+            </Text>
+        </View>
     </Pressable>
-  );
+);
+
+
+  // const renderTrendingTrack = ({ item }) => (
+  //   <Pressable
+  //     style={{
+  //       flexDirection: "row",
+  //       alignItems: "center",
+  //       backgroundColor: "#282828",
+  //       marginVertical: 8,
+  //       marginHorizontal: 10,
+  //       borderRadius: 8,
+  //       padding: 10,
+  //     }}
+  //   >
+  //     <Image
+  //       style={{ width: 55, height: 55, borderRadius: 4 }}
+  //       source={{ uri: item.track.album.images[0].url }}
+  //     />
+  //     <View style={{ marginLeft: 10 }}>
+  //       <Text
+  //         numberOfLines={1}
+  //         style={{ fontSize: 15, fontWeight: "bold", color: "white" }}
+  //       >
+  //         {item.track.name}
+  //       </Text>
+  //       <Text
+  //         numberOfLines={1}
+  //         style={{ fontSize: 13, color: "gray", marginTop: 4 }}
+  //       >
+  //         {item.track.artists.map((artist) => artist.name).join(", ")}
+  //       </Text>
+  //     </View>
+  //   </Pressable>
+  // );
+
+ 
 
   return (
     <LinearGradient colors={["#040306", "#131624"]} style={{ flex: 1 }}>

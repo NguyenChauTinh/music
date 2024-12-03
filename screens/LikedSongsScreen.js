@@ -27,6 +27,8 @@ import { ModalContent } from "react-native-modals";
 import { Audio } from "expo-av";
 import { debounce } from "lodash";
 
+import { Buffer } from 'buffer';
+
 const LikedSongsScreen = () => {
   const colors = [
     "#27374D",
