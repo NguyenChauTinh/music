@@ -443,7 +443,7 @@ const LikedSongsScreen = () => {
               />
 
               <Text
-                style={{ fontSize: 14, fontWeight: "bold", color: "white" }}
+                style={{ fontSize: 24, fontWeight: "bold", color: "white" }}
               >
                 {currentTrack?.name}
               </Text>

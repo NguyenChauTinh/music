@@ -238,7 +238,7 @@ const getTrendingTracks = async () => {
     >
         <Image
             style={{ width: 55, height: 55, borderRadius: 4 }}
-            source={{ uri: item.coverArt }} // Sử dụng đúng field trả về từ `getTracks`
+            source={{ uri: "https://sctt.net.vn/wp-content/uploads/2021/06/spotify_hero_4-1024x474.jpg" }} // Sử dụng đúng field trả về từ `getTracks`
         />
         <View style={{ marginLeft: 10 }}>
             <Text
@@ -312,7 +312,11 @@ const getTrendingTracks = async () => {
                 borderRadius: 20,
                 resizeMode: "cover",
               }}
-              source={{ uri: userProfile?.images[0].url }}
+              source={{
+                uri:
+                  userProfile?.images?.[0]?.url ||
+                  "https://sctt.net.vn/wp-content/uploads/2021/06/spotify_hero_4-1024x474.jpg",
+              }}
             />
             <Text
               style={{
@@ -434,6 +438,7 @@ const getTrendingTracks = async () => {
           </View>
         </View>
         <FlatList
+        
           data={recentlyplayed}
           renderItem={renderItem}
           numColumns={2}
@@ -453,6 +458,8 @@ const getTrendingTracks = async () => {
           Trending Tracks
         </Text>
         <FlatList
+        nestedScrollEnabled={true}
+
           data={trendingTracks}
           renderItem={renderTrendingTrack}
           keyExtractor={(item, index) => index.toString()}
@@ -471,7 +478,8 @@ const getTrendingTracks = async () => {
         >
           Your Follower Artists
         </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled={true}
+        >
           {followedArtists.map((item, index) => (
             <Pressable key={index} onPress={() => handleArtistPress(item)}>
               <ArtistCard item={item} />
@@ -494,6 +502,8 @@ const getTrendingTracks = async () => {
         </Text>
         <FlatList
           // style={{ marginVertical: 10 }}
+          nestedScrollEnabled={true}
+
           data={recentlyplayed}
           horizontal
           showsHorizontalScrollIndicator={false}

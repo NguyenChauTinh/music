@@ -85,24 +85,28 @@ const ProfileScreen = () => {
         >
           Your Playlists
         </Text>
-        <View style={{padding:15}}>
-          {playlists.map((item, index) => (
-            <View style={{flexDirection:"row",alignItems:"center",gap:8,marginVertical:10}}>
-              <Image
-                source={{
-                  uri:
-                    item?.images[0]?.url ||
-                    "https://images.pexels.com/photos/3944091/pexels-photo-3944091.jpeg?auto=compress&cs=tinysrgb&w=800",
-                }}
-                style={{ width: 50, height: 50, borderRadius: 4 }}
-              />
-              <View>
-                <Text style={{color:"white"}}>{item?.name}</Text>
-                <Text  style={{color:"white",marginTop:7}}>0 followers</Text>
-              </View>
-            </View>
-          ))}
-        </View>
+        <View style={{ padding: 15 }}>
+  {playlists.map((item) => (
+    <View
+      key={item.id} // Thêm key duy nhất cho mỗi phần tử
+      style={{ flexDirection: "row", alignItems: "center", gap: 8, marginVertical: 10 }}
+    >
+      <Image
+        source={{
+          uri:
+            item?.images[0]?.url ||
+            "https://images.pexels.com/photos/3944091/pexels-photo-3944091.jpeg?auto=compress&cs=tinysrgb&w=800",
+        }}
+        style={{ width: 50, height: 50, borderRadius: 4 }}
+      />
+      <View>
+        <Text style={{ color: "white" }}>{item?.name}</Text>
+        <Text style={{ color: "white", marginTop: 7 }}>0 followers</Text>
+      </View>
+    </View>
+  ))}
+</View>
+
       </ScrollView>
     </LinearGradient>
   );
